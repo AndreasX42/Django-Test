@@ -1,0 +1,41 @@
+<h1>Portfolio Values</h1>
+
+<form (submit)="onSubmit()">
+  <p>
+    <label>Start Date: </label>
+    <input
+      type="date"
+      id="startDate"
+      [(ngModel)]="startDate"
+      name="startDate"
+      required
+    />
+  </p>
+
+  <p>
+    <label>End Date: </label>
+    <input
+      type="date"
+      id="endDate"
+      [(ngModel)]="endDate"
+      name="endDate"
+      required
+    />
+  </p>
+
+  <button type="submit">Generate Graph</button>
+</form>
+
+@if(portfolioValues()) {
+<div>
+  <div *ngFor="let portfolio of portfolioValues().portfolios">
+    <h2>Portfolio {{ portfolio.portfolio_id }}</h2>
+
+    <h3>Stacked Weights</h3>
+    <canvas [id]="'weightChart' + portfolio.portfolio_id"></canvas>
+
+    <h3>Portfolio Value</h3>
+    <canvas [id]="'valueChart' + portfolio.portfolio_id"></canvas>
+  </div>
+</div>
+}
