@@ -19,7 +19,7 @@ class Asset(models.Model):
 
 
 class AssetInitials(models.Model):
-    asset_name = models.ForeignKey(Asset, on_delete=models.CASCADE)
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     portfolio_id = models.PositiveIntegerField(null=False)
     initial_quantity = models.DecimalField(max_digits=32, decimal_places=8, null=False)
     initial_weight = models.DecimalField(max_digits=6, decimal_places=4, null=False)
@@ -28,29 +28,25 @@ class AssetInitials(models.Model):
         db_table = "asset_initials"
         constraints = [
             models.UniqueConstraint(
-                fields=["asset_name", "portfolio_id"],
-                name="unique_portfolio_asset_name_portfolio_id",
+                fields=["asset", "portfolio_id"],
+                name="unique_asset_portfolio_id",
             )
         ]
 
     def __str__(self):
-        return f"AssetInitials[name={self.asset_name}, portfolio_id={self.portfolio_id}, c_0={self.initial_quantity}, w_0={self.initial_weight}]"
+        return f"AssetInitials[name={self.asset.asset_name}, portfolio_id={self.portfolio_id}, c_0={self.initial_quantity}, w_0={self.initial_weight}]"
 
 
 class AssetPrice(models.Model):
-    asset_name = models.ForeignKey(Asset, on_delete=models.CASCADE)
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     date = models.DateField(null=False)
     price = models.DecimalField(max_digits=32, decimal_places=8, null=False)
 
     class Meta:
         db_table = "asset_prices"
         constraints = [
-            models.UniqueConstraint(
-                fields=["asset_name", "date"], name="unique_asset_name_date"
-            )
+            models.UniqueConstraint(fields=["asset", "date"], name="unique_asset_date")
         ]
 
     def __str__(self):
-        return (
-            f"AssetPrice[asset={self.asset_name}, date={self.date}, price={self.price}]"
-        )
+        return f"AssetPrice[asset={self.asset.asset_name}, date={self.date}, price={self.price}]"

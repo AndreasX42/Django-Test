@@ -46,4 +46,4 @@ Thumbs.db
 # Python ignore list
 **.pyc
 /api/.venv
-postgres/data
+postgres/data/

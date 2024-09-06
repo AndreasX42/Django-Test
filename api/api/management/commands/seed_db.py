@@ -56,7 +56,11 @@ class Command(BaseCommand):
     ):
 
         # calculate initial quantity for all assets and portfolios
-        initial_prices = prices_df.iloc[0].values[1:]
+        # steps: 1. Select everything starting at second column (excluding date)
+        #        2. Sort columns by order of asset names in weights_df.Activos
+        #        3. Select first row of prices
+        initial_prices = prices_df.iloc[:, 1:][weights_df.activos.values].iloc[0].values
+
         initial_weights_p1 = weights_df["portafolio 1"].values
         initial_weights_p2 = weights_df["portafolio 2"].values
 
@@ -72,7 +76,7 @@ class Command(BaseCommand):
 
             # create asset entity for portfolio 1
             self.create_asset_initials(
-                asset_name=self.assets_map[asset_name],
+                asset=self.assets_map[asset_name],
                 portfolio_id=1,
                 initial_weight=weight_p1,
                 initial_quantity=initial_quantities_p1[i],
@@ -80,7 +84,7 @@ class Command(BaseCommand):
 
             # create asset entity for portfolio 2
             self.create_asset_initials(
-                asset_name=self.assets_map[asset_name],
+                asset=self.assets_map[asset_name],
                 portfolio_id=2,
                 initial_weight=weight_p2,
                 initial_quantity=initial_quantities_p2[i],
@@ -92,15 +96,14 @@ class Command(BaseCommand):
         dates_list = [pd.to_datetime(d).date() for d in prices_df.Dates.values]
 
         for asset_name, price_data in prices_df.iloc[:, 1:].items():
-
             for price_date, price in zip(dates_list, price_data):
                 AssetPrice.objects.create(
-                    asset_name=self.assets_map[asset_name], date=price_date, price=price
+                    asset=self.assets_map[asset_name], date=price_date, price=price
                 )
 
     def create_asset_initials(
         self,
-        asset_name: Asset,
+        asset: Asset,
         portfolio_id: int,
         initial_weight: float,
         initial_quantity: float,
@@ -108,16 +111,8 @@ class Command(BaseCommand):
 
         # create table row for portfolio weight data
         AssetInitials.objects.create(
-            asset_name=asset_name,
+            asset=asset,
             portfolio_id=portfolio_id,
             initial_weight=initial_weight,
             initial_quantity=initial_quantity,
-        )
-
-    def create_asset_price(self, price_data: date, asset_name: str, price: float):
-        # create table row for portfolio price data
-        AssetPrice.objects.create(
-            asset_name=asset_name,
-            date=price_data,
-            price=price,
         )

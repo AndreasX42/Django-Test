@@ -88,16 +88,18 @@ def calculate_values_at_t_for_portfolio(
 
     # get the prices for each asset for the specific date
     price_data = AssetPrice.objects.filter(date=date)
-    asset_prices = np.array([float(data.price) for data in price_data])
+
+    # order prices according to order of asset names in assets list
+    prices_map = {data.asset: float(data.price) for data in price_data}
+    asset_prices = np.array([prices_map.get(asset, 0.0) for asset in assets])
 
     # get the quantity per asset from initial values
     asset_quantities = np.array([0] * len(assets))
     for i, asset in enumerate(assets):
-        initials = AssetInitials.objects.get(
-            portfolio_id=portfolio_id, asset_name=asset
-        )
+        initials = AssetInitials.objects.get(portfolio_id=portfolio_id, asset=asset)
         asset_quantities[i] = initials.initial_quantity
 
+    # both numpy arrays are sorted correctly according to assets
     # calculate the current market value for each asset
     asset_values = asset_quantities * asset_prices
 
